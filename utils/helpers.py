@@ -1,5 +1,7 @@
 import logging
 
+from requests.api import get
+
 import settings
 import requests
 from envparse import env
@@ -24,6 +26,7 @@ def get_logger(name: str='__main__', handler=None, formatter=None):
 
     return logger
 
+#TODO add await to request.post/delete
 async def addToElastic(index, id, data):
     logger = get_logger(__name__)
     url = f'{settings.ELASTIC_HOST}/{index}/_doc/{id}'
@@ -37,3 +40,7 @@ async def deleteFromElastic(index, id):
     url = f'{settings.ELASTIC_HOST}/{index}/_doc/{id}'
     requests.delete(url)
     logger.debug(f'url for add is {url}')
+
+async def getFromElastic(index, id):
+    url = f'{settings.ELASTIC_HOST}/{index}/_doc/{id}'
+    return requests.get(url).json()
