@@ -13,6 +13,7 @@ DB_PORT = env.int('DB_PORT')
 DB_NAME = env.str('DB_NAME')
 DB_USER = env.str('DB_USER')
 DB_PASSWORD = env.str('DB_PASSWORD')
+ELASTIC_HOST = env.str('ELASTIC_HOST')
 
 # logging
 LOG_LEVEL = env.str('LOG_LEVEL', default='ERROR')
