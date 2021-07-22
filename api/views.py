@@ -4,7 +4,7 @@ from aiohttp import web
 
 import settings
 from api.models import Choice, Question
-from utils.helpers import get_logger
+from utils.helpers import ChoiceIndex, QuestionIndex, addToElastic, deleteFromElastic, get_logger
 
 logger = get_logger(__name__)
 
@@ -74,6 +74,7 @@ class QuestionHandler(BaseHandler):
 
         question = await Question.add(data)
         result = self._format_obj(question)
+        await addToElastic(QuestionIndex, result["id"], result)
 
         logger.debug(f'A new question added: {result}')
 
@@ -96,7 +97,8 @@ class QuestionHandler(BaseHandler):
                 'error_message': 'Object is not found by "id"'
             }
             return web.json_response(result, status=404)
-
+        await deleteFromElastic(QuestionIndex, self.pk)
+        
         return web.json_response(status=202)
 
 
@@ -189,6 +191,8 @@ class ChoiceHandler(BaseHandler):
                 status=web.HTTPNotFound.status_code)
 
         result = self._format_obj(choice)
+        await addToElastic(ChoiceIndex, choice["id"], choice)
+
         logger.debug(f'A new choice added: {result}')
 
         return web.json_response(
