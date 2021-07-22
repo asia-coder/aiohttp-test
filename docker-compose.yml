@@ -25,8 +25,6 @@ services:
     depends_on:
       - db
       - elasticsearch
-    networks: 
-      - elastic
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
     container_name: elasticsearch
@@ -37,8 +35,6 @@ services:
         - vibhuviesdata:/usr/share/elasticsearch/data
     ports:
         - 9200:9200
-    networks:
-        - elastic
     labels:
         - co.elastic.logs/module=elasticsearch
         - co.elastic.metrics/module=elasticsearch
@@ -52,8 +48,6 @@ services:
       environment:
           ELASTICSEARCH_URL: http://elasticsearch:9200
           ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-      networks:
-          - elastic
 volumes:
   vibhuviesdata:
     driver: local
@@ -62,5 +56,3 @@ networks:
   default:
     driver: bridge
     name: app-network
-  elastic:
-    driver: bridge
