@@ -1,5 +1,6 @@
 version: "3.8"
 services:
+
   db:
     image: postgres:latest
     container_name: db
@@ -7,44 +8,24 @@ services:
     ports:
       - 5432:5432
     environment:
-      - POSTGRES_DB=vote
-      - POSTGRES_USER=vote_user
-      - POSTGRES_PASSWORD=vote123
-    networks:
-      - app-network
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
 
-  db_test:
-    image: postgres:latest
-    container_name: db_test
-    restart: always
-    ports:
-      - 5433:5432
-    environment:
-      - POSTGRES_DB=vote_test
-      - POSTGRES_USER=vote_user
-      - POSTGRES_PASSWORD=vote123
-    networks:
-      - app-network
-
-  web:
+  app:
     build:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - .:/var/www/aiohttp
+      - ./:/var/www/aiohttp
+      - ./db:/var/www/aiohttp/db
     ports:
       - 8000:8000
-    links:
-      - db
-      - db_test
-    working_dir: /var/www/aiohttp
     env_file: .env
     depends_on:
       - db
-      - db_test
-    networks:
-      - app-network
 
 networks:
-  app-network:
+  default:
     driver: bridge
+    name: app-network
