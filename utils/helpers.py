@@ -1,3 +1,4 @@
+import json
 import logging
 
 from requests.api import get
@@ -5,6 +6,7 @@ from requests.api import get
 import settings
 import requests
 from envparse import env
+import aiohttp
 
 QuestionIndex = "question"
 ChoiceIndex = "choice"
@@ -29,18 +31,23 @@ def get_logger(name: str='__main__', handler=None, formatter=None):
 #TODO add await to request.post/delete
 async def addToElastic(index, id, data):
     logger = get_logger(__name__)
-    url = f'{settings.ELASTIC_HOST}/{index}/_doc/{id}'
-    # url = url.format(settings.ELASTIC_HOST, index, id)
-    logger.debug(f'url for add is {url}')
 
-    requests.post(url, json=data)
+    url = f'{settings.ELASTIC_HOST}/{index}/_doc/{id}'
+    
+    logger.debug(f'url for add is {url}')
+    async with aiohttp.ClientSession() as session:
+        await session.post(url, json=data)
 
 async def deleteFromElastic(index, id):
     logger = get_logger(__name__)
+
     url = f'{settings.ELASTIC_HOST}/{index}/_doc/{id}'
-    requests.delete(url)
+    async with aiohttp.ClientSession() as session:
+        await session.delete(url)
     logger.debug(f'url for add is {url}')
 
 async def getFromElastic(index, id):
     url = f'{settings.ELASTIC_HOST}/{index}/_doc/{id}'
-    return requests.get(url).json()
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            return await resp.json()
