@@ -191,7 +191,7 @@ class ChoiceHandler(BaseHandler):
                 status=web.HTTPNotFound.status_code)
 
         result = self._format_obj(choice)
-        await addToElastic(ChoiceIndex, choice["id"], choice)
+        await addToElastic(ChoiceIndex, result["id"], result)
 
         logger.debug(f'A new choice added: {result}')
 

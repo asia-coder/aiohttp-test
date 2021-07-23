@@ -1,11 +1,6 @@
-import json
 import logging
 
-from requests.api import get
-
 import settings
-import requests
-from envparse import env
 import aiohttp
 
 QuestionIndex = "question"
@@ -28,7 +23,6 @@ def get_logger(name: str='__main__', handler=None, formatter=None):
 
     return logger
 
-#TODO add await to request.post/delete
 async def addToElastic(index, id, data):
     logger = get_logger(__name__)
 

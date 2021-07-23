@@ -13,8 +13,7 @@ import api.models as models
 from routes import routes
 
 fake = Faker()
-DB_NAME = settings.DB_NAME + '_test'
-DB_PORT = 5433
+DB_NAME = settings.DB_NAME
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -22,7 +21,6 @@ def setup_db():
     # init db
     models.database.init(
         host=settings.DB_HOST,
-        port=DB_PORT,
         database=DB_NAME,
         user=settings.DB_USER,
         password=settings.DB_PASSWORD)
