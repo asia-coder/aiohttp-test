@@ -1,11 +1,10 @@
 import logging
 
 import settings
-import aiohttp
+import requests_async as requests
 
 QuestionIndex = "question"
 ChoiceIndex = "choice"
-
 
 def get_logger(name: str='__main__', handler=None, formatter=None):
     if not handler:
@@ -23,25 +22,28 @@ def get_logger(name: str='__main__', handler=None, formatter=None):
 
     return logger
 
-async def addToElastic(index, id, data):
-    logger = get_logger(__name__)
+logger = get_logger(__name__)
 
+async def addToElastic(index, id, data):
     url = f'{settings.ELASTIC_HOST}/{index}/_doc/{id}'
     
     logger.debug(f'url for add is {url}')
-    async with aiohttp.ClientSession() as session:
-        await session.post(url, json=data)
+
+    await requests.post(url, json=data)
 
 async def deleteFromElastic(index, id):
-    logger = get_logger(__name__)
-
     url = f'{settings.ELASTIC_HOST}/{index}/_doc/{id}'
-    async with aiohttp.ClientSession() as session:
-        await session.delete(url)
+
     logger.debug(f'url for add is {url}')
+
+    await requests.delete(url)
 
 async def getFromElastic(index, id):
     url = f'{settings.ELASTIC_HOST}/{index}/_doc/{id}'
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as resp:
-            return await resp.json()
+
+    logger.debug(f'url for add is {url}')
+
+    resp = await requests.get(url)
+    resp_json = resp.json()
+
+    return resp_json

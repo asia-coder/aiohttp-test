@@ -2,6 +2,7 @@ import pytest
 from aiohttp import web
 
 import settings
+from utils.helpers import getFromElastic, QuestionIndex, ChoiceIndex
 from api.models import Question
 
 
@@ -38,9 +39,19 @@ async def test_post_question(cli, route_path, question_factory):
 
     assert (resp_json.get('id') > 0) is True
 
+    elastic_index_data = await getFromElastic(QuestionIndex, resp_json.get('id'))
+
+    print(elastic_index_data)
+
+    assert elastic_index_data.get('found') is True
+
 
 async def test_delete_question(cli, route_path, question):
     resp = await cli.delete(route_path('question_obj', str(question.id)))
+
+    elastic_index_data = await getFromElastic(QuestionIndex, question.id)
+
+    assert elastic_index_data.get('found') is False
 
     assert (resp.status == web.HTTPAccepted.status_code) is True
     with pytest.raises(Question.DoesNotExist):
@@ -89,3 +100,9 @@ async def test_post_choice(cli, route_path, question, choice_factory):
     print(resp_json)
 
     assert (resp_json.get('id') > 0) is True
+
+    elastic_index_data = await getFromElastic(ChoiceIndex, resp_json.get('id'))
+
+    print(elastic_index_data)
+
+    assert elastic_index_data.get('found') is True
